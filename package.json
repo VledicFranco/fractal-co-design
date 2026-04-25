@@ -1,0 +1,19 @@
+{
+  "name": "fractal-co-design",
+  "private": true,
+  "scripts": {
+    "build": "pnpm --filter './packages/*' --filter './apps/*' build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "docs:dev": "pnpm --filter @fractal-co-design/docs dev",
+    "docs:build": "pnpm --filter @fractal-co-design/docs build"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

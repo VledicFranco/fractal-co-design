@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.turbo/
+.cache/
+*.log
+.DS_Store
+.env
+.env.local
+coverage/
+playwright-report/
+test-results/
+
+# Astro / docs build
+apps/docs/.astro/
+apps/docs/dist/
