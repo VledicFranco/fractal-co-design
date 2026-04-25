@@ -27,6 +27,16 @@ Reading order:
 2. [`02-software-translation.md`](./ecd/02-software-translation.md) — applying it to software
 3. [`03-fca-synthesis.md`](./ecd/03-fca-synthesis.md) — how ECD and FCA fit together
 
+## [`prds/`](./prds/) — Canonical Product Requirement Documents
+
+The **design record** layer. Historical PRDs that specified work which shipped in `@fractal-co-design/*` packages, preserved verbatim as durable design artifacts.
+
+See [`prds/README.md`](./prds/README.md) for the full index. Currently:
+
+- **PRD 053** — `@fractal-co-design/fca-index` library foundation
+- **PRD 054** — fca-index MCP context tools
+- **PRD 057** — fca-index language profiles (v0.4.0 → v1.0.0)
+
 ## How the canon is used
 
 - **By the [`fcd-*` Claude skills](../skills/)** — each skill loads or references canon sections to inform agent behavior. Skills are the canon-in-action.

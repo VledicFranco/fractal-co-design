@@ -26,3 +26,9 @@ jobs:
 
       - name: Typecheck docs site
         run: pnpm --filter @fractal-co-design/docs typecheck
+
+      - name: Build fca-index
+        run: pnpm --filter @fractal-co-design/fca-index build
+
+      - name: Test fca-index
+        run: pnpm --filter @fractal-co-design/fca-index test
