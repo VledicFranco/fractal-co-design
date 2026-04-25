@@ -5,7 +5,7 @@
  * Records all calls for assertion, returns configurable stub results.
  * Use in @methodts/mcp tests that consume ContextQueryPort.
  *
- * Part of @methodts/fca-index/testkit — not included in production bundle.
+ * Part of @fractal-co-design/fca-index/testkit — not included in production bundle.
  */
 
 import type { ContextQueryPort, ContextQueryRequest, ContextQueryResult, ComponentContext } from '../ports/context-query.js';

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * FCA Architecture Gate Tests — @methodts/fca-index
+ * FCA Architecture Gate Tests — @fractal-co-design/fca-index
  *
  * Structural fitness functions enforcing FCA invariants within this package.
  * Runs on every `npm test`. Added in Wave 0 as stubs; filled in C-6 (Wave 3).

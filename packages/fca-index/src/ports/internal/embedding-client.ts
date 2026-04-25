@@ -2,7 +2,7 @@
 /**
  * EmbeddingClientPort — Internal port isolating index-store domain from HTTP calls.
  *
- * Owner: @methodts/fca-index (defines interface + provides VoyageEmbeddingClient impl)
+ * Owner: @fractal-co-design/fca-index (defines interface + provides VoyageEmbeddingClient impl)
  * Consumer: index-store domain (internal)
  * Direction: embedding service → index-store (unidirectional)
  * Status: frozen 2026-04-08

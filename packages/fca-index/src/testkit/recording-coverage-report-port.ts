@@ -5,7 +5,7 @@
  * Records calls and returns configurable stub reports.
  * Use in @methodts/mcp tests that consume CoverageReportPort.
  *
- * Part of @methodts/fca-index/testkit — not included in production bundle.
+ * Part of @fractal-co-design/fca-index/testkit — not included in production bundle.
  */
 
 import type { CoverageReportPort, CoverageReportRequest, CoverageReport, CoverageSummary } from '../ports/coverage-report.js';

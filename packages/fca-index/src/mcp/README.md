@@ -59,7 +59,7 @@ As a standalone binary via `npx`:
 Or as a programmatic import (e.g., to compose with additional middleware):
 
 ```typescript
-import '@methodts/fca-index/mcp';
+import '@fractal-co-design/fca-index/mcp';
 ```
 
 The server reads configuration from env:
@@ -94,7 +94,7 @@ fca-index constraint — documented here because it affects adoption.
 formatters. This standalone server duplicates the rendering logic
 intentionally, to keep the two composition roots independent. When a future
 change benefits from unifying them, `@methodts/mcp` can import from
-`@methodts/fca-index/mcp`. Until then, keep the two copies in sync for the
+`@fractal-co-design/fca-index/mcp`. Until then, keep the two copies in sync for the
 formatter rendering contract.
 
 ## Observability

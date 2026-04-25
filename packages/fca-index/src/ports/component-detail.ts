@@ -8,7 +8,7 @@
  *
  * No embedding calls are made — this is a pure SQLite lookup.
  *
- * Owner:     @methodts/fca-index
+ * Owner:     @fractal-co-design/fca-index
  * Consumer:  @methodts/mcp (context_detail tool handler)
  * Direction: fca-index → mcp (unidirectional)
  * Co-designed: 2026-04-09

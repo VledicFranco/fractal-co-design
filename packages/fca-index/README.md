@@ -1,4 +1,4 @@
-# @methodts/fca-index
+# @fractal-co-design/fca-index
 
 Indexes FCA-compliant projects using a hybrid SQLite + Lance embedding store over co-located documentation. Agents retrieve relevant code context with a single typed query at less than 20% of grep-based token cost.
 
@@ -6,7 +6,7 @@ Indexes FCA-compliant projects using a hybrid SQLite + Lance embedding store ove
 
 Agents navigating a codebase spend 30–60% of their token budget on file-search heuristics: recursive greps, directory listings, manifest reads, and dead-end reads. In a 50-component FCA project, finding the three components relevant to a task can take 30+ file reads.
 
-`@methodts/fca-index` replaces that with a semantic index. After a one-time scan, a typed query returns a ranked list of component descriptors — paths, part locations, and excerpts — without reading any source files. The agent reads only the files it selects from the results.
+`@fractal-co-design/fca-index` replaces that with a semantic index. After a one-time scan, a typed query returns a ranked list of component descriptors — paths, part locations, and excerpts — without reading any source files. The agent reads only the files it selects from the results.
 
 ## Operating modes
 
@@ -23,7 +23,7 @@ The threshold defaults to `0.8`. Check the mode before trusting query results �
 
 ```bash
 # Install
-npm install @methodts/fca-index
+npm install @fractal-co-design/fca-index
 
 # Set your Voyage API key
 export VOYAGE_API_KEY=your_key
@@ -41,7 +41,7 @@ fca-index coverage /path/to/project
 ### Programmatic API
 
 ```typescript
-import { createDefaultFcaIndex } from '@methodts/fca-index';
+import { createDefaultFcaIndex } from '@fractal-co-design/fca-index';
 
 const fca = await createDefaultFcaIndex({
   projectRoot: '/path/to/project',
@@ -88,7 +88,7 @@ Programmatic SDK usage — pass `LanguageProfile[]` directly when you have a cus
 or want to override `.fca-index.yaml`:
 
 ```typescript
-import { createDefaultFcaIndex, scalaProfile, typescriptProfile } from '@methodts/fca-index';
+import { createDefaultFcaIndex, scalaProfile, typescriptProfile } from '@fractal-co-design/fca-index';
 
 const fca = await createDefaultFcaIndex({
   projectRoot,
@@ -157,7 +157,7 @@ interface FcaIndex {
 For testing code that consumes the external ports, import from the testkit subpackage:
 
 ```typescript
-import { RecordingContextQueryPort } from '@methodts/fca-index/testkit';
+import { RecordingContextQueryPort } from '@fractal-co-design/fca-index/testkit';
 
 const port = new RecordingContextQueryPort({
   results: [/* stub ComponentContext objects */],
@@ -178,7 +178,7 @@ See `src/testkit/README.md` for full testkit documentation.
 | Attribute | Value |
 |-----------|-------|
 | Layer | L3 — library |
-| Dependencies | `@methodts/fca-index` has zero dependencies on `@methodts/mcp` or `@methodts/bridge` |
+| Dependencies | `@fractal-co-design/fca-index` has zero dependencies on `@methodts/mcp` or `@methodts/bridge` |
 | External ports | `ContextQueryPort`, `CoverageReportPort`, `ManifestReaderPort` — frozen 2026-04-08 |
 | Internal ports | `FileSystemPort`, `EmbeddingClientPort`, `IndexStorePort` |
 
