@@ -9,9 +9,13 @@
     "build:cli": "pnpm --filter @fractal-co-design/skills build",
     "test:cli": "pnpm --filter @fractal-co-design/skills test",
     "docs:dev": "pnpm --filter @fractal-co-design/docs dev",
-    "docs:build": "pnpm --filter @fractal-co-design/docs build"
+    "docs:build": "pnpm --filter @fractal-co-design/docs build",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "pnpm build && changeset publish"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
     "typescript": "^5.7.0"
   },
   "packageManager": "pnpm@9.15.0",

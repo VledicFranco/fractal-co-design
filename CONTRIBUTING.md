@@ -12,9 +12,10 @@ Thanks for considering a contribution. FCD is a methodology project as much as i
 ## Workflow
 
 1. Open an issue describing the change before significant work — especially for canon and tool design changes.
-2. Branch from `main`. Use prefix `feat/`, `fix/`, `docs/`, `canon/` for clarity.
+2. Branch from `main`. Use prefix `feat/`, `fix/`, `docs/`, `canon/`, `chore/` for clarity.
 3. PRs target `main`. CI must pass before merge.
 4. New tools follow port-first design: define and freeze the external surface (port interface) before implementation. See `canon/ecd/` for the discipline.
+5. **Add a changeset for any user-visible change** to a publishable package: `pnpm changeset` → pick package(s) + bump type + summary. See [`PUBLISHING.md`](./PUBLISHING.md) for the full release flow.
 
 ## License
 
