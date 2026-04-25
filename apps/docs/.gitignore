@@ -1,0 +1,15 @@
+# Astro build output
+dist/
+.astro/
+
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+
+# Synced canon content (single source of truth is repo-root canon/)
+src/content/docs/canon/fca/0*.md
+src/content/docs/canon/fca/advice/0*.md
+src/content/docs/canon/ecd/0*.md
