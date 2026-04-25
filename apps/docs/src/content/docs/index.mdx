@@ -1,0 +1,54 @@
+---
+title: Fractal Co-Design
+description: A software design methodology combining Fractal Component Architecture (structure) with Extreme Co-Design (process). Port-first. Surface before architecture.
+template: splash
+hero:
+  tagline: Port-first. Surface before architecture. The same structural discipline at every scale.
+  actions:
+    - text: Read the canon
+      link: /fractal-co-design/canon/
+      icon: right-arrow
+    - text: Install the skills
+      link: /fractal-co-design/skills/
+      variant: minimal
+    - text: View on GitHub
+      link: https://github.com/VledicFranco/fractal-co-design
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What is Fractal Co-Design?
+
+**Fractal Co-Design (FCD)** is a software design methodology that combines two complementary ideas:
+
+- **Fractal Component Architecture (FCA)** — *structural*. The same 8-part component model repeats from a function to a package to a system. Co-located documentation. Port-based dependency injection. Boundaries enforced by directory structure.
+- **Extreme Co-Design (ECD)** — *process*. Domains identified first, shared surfaces (ports) co-designed second, internal architecture follows third — constrained by the frozen ports.
+
+Together: every cross-domain interaction is a co-designed, frozen port. Architecture decisions follow port correctness, not the other way around.
+
+<CardGrid>
+  <Card title="The Component" icon="puzzle">
+    Eight structural parts — Interface, Boundary, Port, Domain, Architecture, Verification, Observability, Documentation — that repeat at every scale of software.
+  </Card>
+  <Card title="The Levels" icon="seti:hex">
+    L0 (Function) through L5 (System). The same discipline applies at each scale, with promotion and demotion as the system grows.
+  </Card>
+  <Card title="Surface-First" icon="approve-check">
+    Ports are co-designed and frozen before either side implements. The interface between components matters more than the implementation within them.
+  </Card>
+  <Card title="Claude Skills" icon="rocket">
+    The <code>fcd-*</code> skill family bakes FCD discipline into Claude Code: card, design, plan, surface, commission, debate, review.
+  </Card>
+</CardGrid>
+
+## The fastest path
+
+1. **[FCA — The Component](/fractal-co-design/canon/fca/01-the-component/)** — what an FCA component is, the 8 parts, the fractal claim.
+2. **[ECD — Extreme Co-Design](/fractal-co-design/canon/ecd/01-extreme-co-design/)** — the process discipline that makes FCA tractable in teams.
+3. **[FCA — Applied Example](/fractal-co-design/canon/fca/07-applied-example/)** — the methodology in action.
+
+## Status
+
+This is the **v0.1** documentation site. Canon (FCA + ECD) and the `fcd-*` Claude skills are stable. The `@fractal-co-design/fca-index` tool is migrating from `@methodts/fca-index@0.4` and will land in v0.2 with rich diagram embeds via [GlyphJS](https://github.com/VledicFranco/glyphjs).

@@ -43,7 +43,7 @@ Or start at the [docs site](https://vledicfranco.github.io/fractal-co-design/) w
 |---|---|
 | Canon (FCA + ECD) | ✅ v0.1 |
 | Claude skills (`fcd-*`) | ✅ v0.1 |
-| Docs site | 🚧 v0.1 in progress |
+| Docs site | ✅ v0.1 |
 | `@fractal-co-design/skills` CLI | ✅ v0.1 |
 | `@fractal-co-design/fca-index` | 📅 v0.2 (migrating from `@methodts/fca-index@0.4`) |
 
