@@ -28,10 +28,15 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Trusted publishing (OIDC) requires Node ≥ 22.14.0 + npm ≥ 11.5.1.
+          # 22.x ships npm 10.x by default — we explicitly upgrade npm below.
+          node-version: '22'
           cache: 'pnpm'
           # Ensure publishes use the public registry; OIDC requires this URL.
           registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm CLI for trusted publishing
+        run: npm install -g npm@latest
 
       - run: pnpm install --frozen-lockfile
 
