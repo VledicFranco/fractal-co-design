@@ -1,0 +1,58 @@
+{
+  "name": "@fractal-co-design/skills",
+  "version": "0.1.0",
+  "description": "CLI installer for the fcd-* Claude Code skill family. Drops skills into ~/.claude/skills/ in one command.",
+  "license": "MIT",
+  "author": "VledicFranco",
+  "type": "module",
+  "main": "./dist/index.js",
+  "bin": {
+    "fractal-co-design": "./dist/index.js",
+    "fcd-skills": "./dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "skills"
+  ],
+  "scripts": {
+    "sync-skills": "node scripts/sync-skills.mjs",
+    "build": "npm run sync-skills && tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.7.0",
+    "vitest": "^1.6.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VledicFranco/fractal-co-design.git",
+    "directory": "packages/skills-cli"
+  },
+  "homepage": "https://github.com/VledicFranco/fractal-co-design/tree/main/packages/skills-cli#readme",
+  "bugs": {
+    "url": "https://github.com/VledicFranco/fractal-co-design/issues"
+  },
+  "keywords": [
+    "claude-code",
+    "claude",
+    "skills",
+    "fcd",
+    "fractal-co-design",
+    "fca",
+    "installer",
+    "cli"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}

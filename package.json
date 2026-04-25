@@ -6,6 +6,8 @@
     "typecheck": "pnpm -r typecheck",
     "lint": "pnpm -r lint",
     "test": "pnpm -r test",
+    "build:cli": "pnpm --filter @fractal-co-design/skills build",
+    "test:cli": "pnpm --filter @fractal-co-design/skills test",
     "docs:dev": "pnpm --filter @fractal-co-design/docs dev",
     "docs:build": "pnpm --filter @fractal-co-design/docs build"
   },
