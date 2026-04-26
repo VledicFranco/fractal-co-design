@@ -1,0 +1,66 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Required for npm OIDC trusted publishing.
+permissions:
+  contents: write       # changesets/action commits version bumps + creates GH releases
+  pull-requests: write  # opens the "Version Packages" PR
+  id-token: write       # mints OIDC token npm uses to verify the publisher
+
+concurrency:
+  group: release
+  cancel-in-progress: false   # never cancel a publish mid-flight
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # full history so changesets can derive previous tags / changelog
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Trusted publishing (OIDC) requires Node ≥ 22.14.0 + npm ≥ 11.5.1.
+          # 22.x ships npm 10.x by default — we explicitly upgrade npm below.
+          node-version: '22'
+          cache: 'pnpm'
+          # Ensure publishes use the public registry; OIDC requires this URL.
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Upgrade npm CLI for trusted publishing
+        run: npm install -g npm@latest
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - run: pnpm test
+
+      # Two modes — handled by changesets/action automatically:
+      #   1. Pending changesets present in main → opens/updates "Version Packages" PR
+      #      (does NOT publish; waits for the PR to be merged).
+      #   2. No pending changesets → runs `publish` script, which calls
+      #      `changeset publish` to push any package whose version is ahead of npm.
+      - name: Create Release PR or Publish
+        uses: changesets/action@v1
+        with:
+          version: pnpm changeset version
+          publish: pnpm changeset publish
+          commit: 'chore(release): version packages'
+          title: 'chore(release): version packages'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # npm OIDC — no NPM_TOKEN needed. The `id-token: write` permission
+          # above lets npm verify this workflow as the trusted publisher
+          # (configured per-package in npm's web UI: Settings → Publishing
+          # → "Trusted Publishers" → add owner=VledicFranco,
+          # repo=fractal-co-design, workflow=.github/workflows/release.yml).
+          NPM_CONFIG_PROVENANCE: true
