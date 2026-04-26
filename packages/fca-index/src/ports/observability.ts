@@ -2,7 +2,7 @@
 /**
  * ObservabilityPort — Structured observability signal for fca-index domains.
  *
- * Owner:       @methodts/fca-index
+ * Owner:       @fractal-co-design/fca-index
  * Callers:     query, index-store (future: scanner, coverage, compliance)
  * Implementers:
  *   - StderrObservabilitySink (fca-index/cli)     — standalone / CLI default

@@ -6,7 +6,7 @@
  * determines which FCA parts are missing, and returns stub content for each.
  * No embedding calls — pure SQLite lookup + template generation.
  *
- * Owner:     @methodts/fca-index (compliance domain)
+ * Owner:     @fractal-co-design/fca-index (compliance domain)
  * Consumer:  CLI (fca-index suggest command)
  * Direction: fca-index → cli (unidirectional)
  * Co-designed: 2026-04-09

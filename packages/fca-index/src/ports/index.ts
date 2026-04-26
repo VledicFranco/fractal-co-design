@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * ports/ — Public port interfaces for @methodts/fca-index.
+ * ports/ — Public port interfaces for @fractal-co-design/fca-index.
  *
  * External ports (frozen, co-designed with consumers):
  *   - ContextQueryPort: semantic search — query → ranked ComponentContext list

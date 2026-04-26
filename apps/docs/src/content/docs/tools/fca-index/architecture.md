@@ -1,0 +1,146 @@
+---
+title: Architecture
+description: Layer placement, domain map, port boundaries, and architectural gates that fca-index enforces.
+---
+
+## Layer placement
+
+`@fractal-co-design/fca-index` is an L3 library. In the original `method` system, dependency flows upward: `@methodts/mcp` (L3 sibling, transport adapter) depends on `@fractal-co-design/fca-index`, not the reverse. The same shape applies wherever the package is consumed.
+
+```
+L4  @methodts/bridge
+L3  @methodts/mcp ──────────────────────────▶ @fractal-co-design/fca-index
+    @methodts/pacta                             (this package)
+    @methodts/methodts
+```
+
+The library is self-contained. It can be used independently of the rest of the method system.
+
+## Domain map
+
+Five internal domains plus the composition root:
+
+| Domain | Responsibility | Input ports | Output ports |
+|--------|---------------|-------------|--------------|
+| `scanner/` | Detect FCA components, extract docs, score coverage | `FileSystemPort`, `ManifestReaderPort` | `IndexEntry[]` to factory |
+| `index-store/` | SQLite + Lance storage, embedding client | `EmbeddingClientPort` (external service) | `IndexStorePort` (consumed by query + coverage) |
+| `query/` | Semantic search — `ContextQueryPort` implementation | `IndexStorePort`, `EmbeddingClientPort` | `ContextQueryPort` |
+| `coverage/` | Coverage analysis — `CoverageReportPort` implementation | `IndexStorePort` | `CoverageReportPort` |
+| `cli/` | `NodeFileSystem`, `DefaultManifestReader`, `Indexer`, CLI commands | `node:fs`, `better-sqlite3`, Voyage HTTP | wires factory for CLI use |
+| `factory.ts` | Composition root — wires all domains into `FcaIndex` facade | all port interfaces | `FcaIndex` facade |
+
+No domain imports another domain's implementation. Cross-domain dependencies flow only through port interfaces.
+
+## Port topology
+
+Six ports, split by visibility:
+
+**External (frozen 2026-04-08) — cross package boundaries:**
+
+| Port | Direction | Consumer |
+|------|-----------|----------|
+| `ContextQueryPort` | fca-index → mcp | `@methodts/mcp` `context_query` tool |
+| `CoverageReportPort` | fca-index → mcp, fca-index → CLI | `@methodts/mcp` `coverage_check`, `fca-index` binary |
+| `ManifestReaderPort` | filesystem → scanner | `@fractal-co-design/fca-index` scanner domain (via factory) |
+
+**Internal (frozen 2026-04-10, extended from 2026-04-08) — within the library:**
+
+| Port | Direction | Consumer |
+|------|-----------|----------|
+| `FileSystemPort` | filesystem → scanner, query | `scanner/` domain, `query/` domain (freshness) |
+| `EmbeddingClientPort` | Voyage AI → index-store | `index-store/` domain, `factory.ts` |
+| `IndexStorePort` | index-store → query, coverage | `query/` and `coverage/` domains |
+
+External ports are co-designed with their consumers and may not change without a co-design session. Internal ports are frozen to stabilize intra-library contracts but carry no cross-package obligation.
+
+## Hybrid index
+
+The index uses two stores with different strengths:
+
+| Store | Technology | Purpose |
+|-------|-----------|---------|
+| SQLite | `better-sqlite3` | Metadata, filters, coverage stats. Fast exact-match queries by level, parts, coverage score. |
+| Lance | `vectordb` (LanceDB) | Embedding vectors. Cosine similarity search. |
+
+A query executes as follows:
+
+1. Embed the query string via `EmbeddingClientPort` (Voyage AI HTTP call).
+2. `queryBySimilarity` — Lance ANN search returns top-N candidate IDs by cosine similarity.
+3. SQLite join applies metadata filters (`parts`, `levels`, `minCoverageScore`) and fetches `IndexEntry` fields.
+4. Results sorted by relevance score and returned as `ComponentContext[]`.
+
+Coverage queries (`getCoverageStats`, `queryByFilters`) use SQLite exclusively — no embedding needed.
+
+The two stores are coordinated by `SqliteLanceIndexStore`. `InMemoryIndexStore` implements the same `IndexStorePort` interface without either dependency, used in tests.
+
+## Index modes
+
+The mode is computed at query time, not stored:
+
+```
+overallScore = weighted average of all component coverageScores
+mode = overallScore >= coverageThreshold ? 'production' : 'discovery'
+```
+
+In `discovery` mode, `ContextQueryResult.mode` and `CoverageReport.mode` both return `'discovery'`. The underlying data is identical — mode is a consumer signal, not a data partition.
+
+The threshold defaults to `0.8`. Configurable via `FcaIndexConfig.coverageThreshold` or `.fca-index.yaml`.
+
+## Composition root
+
+Two factory functions with different tradeoffs:
+
+| Factory | When to use | What it does |
+|---------|-------------|-------------|
+| `createDefaultFcaIndex(config)` | Production, CLI, agent sessions | Constructs all implementations internally. Caller provides only `projectRoot` and `voyageApiKey`. Returns `Promise<FcaIndex>` because it initializes async resources (LanceDB table). |
+| `createFcaIndex(config, ports)` | Tests, custom wiring, alternative stores | Caller provides all four ports. Returns `FcaIndex` synchronously. No infrastructure dependencies at construction time. |
+
+`createDefaultFcaIndex` uses dynamic imports (`await import(...)`) for the infrastructure dependencies (`NodeFileSystem`, `VoyageEmbeddingClient`, `SqliteLanceIndexStore`, `better-sqlite3`). This keeps the package importable in environments that don't have these native modules installed, as long as `createDefaultFcaIndex` is never called.
+
+## Architecture gates
+
+| Gate | Rule | Enforced by |
+|------|------|-------------|
+| `G-PORT-SCANNER` | `scanner/` must not import from `query/`, `coverage/`, or `index-store/` directly | architecture test (`src/architecture.test.ts`) |
+| `G-PORT-QUERY` | `query/` and `coverage/` must not import from `scanner/` or `cli/` | architecture test |
+| `G-BOUNDARY-CLI` | `cli/` must not be imported by `query/`, `coverage/`, or `scanner/` (infra deps stay at the edge) | architecture test |
+| `G-BOUNDARY-DETAIL` | `query/` must not import from `cli/` or `@methodts/mcp` | architecture test |
+| `G-BOUNDARY-COMPLIANCE` | `compliance/` must not import from `cli/` or `@methodts/mcp` | architecture test |
+| `G-BOUNDARY-MCP` | `mcp/` composition root must not reach into domain internals | architecture test |
+| `G-LAYER` | `@fractal-co-design/fca-index` must not import from `@methodts/mcp` or `@methodts/bridge` | package.json + architecture test |
+| `G-PORT-OBSERVABILITY` | Domain code must not write to `process.stderr` directly — use `ObservabilityPort` | architecture test |
+
+## Language profiles (v0.4.0+)
+
+The scanner is parameterised by an ordered list of `LanguageProfile`s. A profile is a pure-data record describing one language ecosystem:
+
+| Field | Purpose |
+|---|---|
+| `sourceExtensions` | File extensions for source files (drives boundary + L1 detection). |
+| `packageMarkers` | Files that mark a directory as L3 (`package.json`, `build.sbt`, `pyproject.toml`, `go.mod`, …). |
+| `filePatterns` | Ordered `RegExp → FcaPart` rules — first match wins per file. |
+| `subdirPatterns` | `dirName → FcaPart` rules for child directories. |
+| `componentRule` | `interfaceFile?` + `minSourceFiles` for component qualification. |
+| `extractInterfaceExcerpt?` / `extractDocBlock?` | Language-specific extractors for the embedding doc text. |
+
+Five built-in profiles ship in v0.4.0: `typescript` (default — preserves v0.3.x behavior), `scala`, `python`, `go`, `markdown-only`. They're exposed via the public surface as `BUILT_IN_PROFILES`, individual exports (`typescriptProfile`, `scalaProfile`, …), and the runtime resolver `resolveLanguageProfiles(names)`.
+
+The flow:
+
+```
+.fca-index.yaml ─┐                                    ┌─▶ FcaDetector
+  languages:     ├─▶ DefaultManifestReader            │
+    - typescript │      │                             │
+    - scala      │      ▼                             │
+                 │   ProjectScanConfig.languages ──┐  │
+                 │      (string[])                 │  │
+FcaIndexConfig.  │      │                          ▼  │
+languages: ──────┼──▶ resolveLanguageProfiles ─▶ effective: LanguageProfile[]
+  (LP[])         │                                    │
+                 ▼                                    └─▶ ProjectScanner
+            createFcaIndex                                (uses union for level/qualification)
+```
+
+When both YAML and programmatic `languages` are set, the programmatic list comes first; the YAML-resolved profiles are appended.
+
+The `LanguageProfile` shape is **frozen** as of v0.4.0 — the same discipline as the external ports. Adding a built-in profile requires shipping a fixture under `tests/fixtures/sample-fca-<lang>/` and a unit-test entry in `profiles/profiles.test.ts`.

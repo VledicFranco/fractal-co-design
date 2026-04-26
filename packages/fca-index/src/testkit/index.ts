@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 /**
- * @methodts/fca-index/testkit — Test doubles for fca-index port interfaces.
+ * @fractal-co-design/fca-index/testkit — Test doubles for fca-index port interfaces.
  *
  * Re-exports recording doubles suitable for use in consumer package tests
  * (e.g. @methodts/mcp). These are not included in the production bundle.

@@ -69,7 +69,19 @@ export default defineConfig({
         },
         {
           label: 'Tools',
-          items: [{ label: 'Overview', slug: 'tools' }],
+          items: [
+            { label: 'Overview', slug: 'tools' },
+            {
+              label: 'fca-index',
+              items: [
+                { label: 'Overview', slug: 'tools/fca-index' },
+                { label: 'Getting Started', slug: 'tools/fca-index/getting-started' },
+                { label: 'Language Profiles', slug: 'tools/fca-index/language-profiles' },
+                { label: 'MCP Tools', slug: 'tools/fca-index/mcp-tools' },
+                { label: 'Architecture', slug: 'tools/fca-index/architecture' },
+              ],
+            },
+          ],
         },
       ],
     }),

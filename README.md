@@ -14,7 +14,7 @@ Together: every cross-domain interaction is a co-designed, frozen port. Architec
 | Directory | What |
 |---|---|
 | **[`canon/`](./canon/)** | The single source of truth — FCA reference (8-part component model, levels, principles) + ECD reference (extreme co-design, software translation, FCA synthesis) |
-| **[`packages/`](./packages/)** | Tools — currently `@fractal-co-design/fca-index`, a semantic-search index over FCA-compliant codebases for token-efficient agent retrieval *(coming v0.2)* |
+| **[`packages/`](./packages/)** | Tools — `@fractal-co-design/fca-index@1.0` (semantic-search index over FCA codebases for token-efficient agent retrieval) and `@fractal-co-design/skills` (CLI installer for the `fcd-*` skill family) |
 | **[`skills/`](./skills/)** | Claude Code skills — the `fcd-*` family (`fcd-card`, `fcd-design`, `fcd-plan`, `fcd-surface`, `fcd-commission`, `fcd-debate`, `fcd-review`) and the `fca` knowledge skill |
 | **[`apps/docs/`](./apps/docs/)** | The documentation site — published to https://vledicfranco.github.io/fractal-co-design/ |
 | **[`examples/`](./examples/)** | Worked examples — custom language profiles, polyglot projects, surface-design walkthroughs |
@@ -45,7 +45,8 @@ Or start at the [docs site](https://vledicfranco.github.io/fractal-co-design/) w
 | Claude skills (`fcd-*`) | ✅ v0.1 |
 | Docs site | ✅ v0.1 |
 | `@fractal-co-design/skills` CLI | ✅ v0.1 |
-| `@fractal-co-design/fca-index` | 📅 v0.2 (migrating from `@methodts/fca-index@0.4`) |
+| `@fractal-co-design/fca-index` | ✅ v0.2 (migrated from `@methodts/fca-index@0.4`, now `@fractal-co-design/fca-index@1.0.0`) |
+| Tools docs | ✅ v0.2 |
 
 ## License
 

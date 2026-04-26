@@ -1,6 +1,6 @@
-# Port Interfaces — @methodts/fca-index
+# Port Interfaces — @fractal-co-design/fca-index
 
-Six port interfaces govern all I/O in `@methodts/fca-index`. Three are external (frozen, co-designed with consumers). Three are internal (implementation isolation within the library).
+Six port interfaces govern all I/O in `@fractal-co-design/fca-index`. Three are external (frozen, co-designed with consumers). Three are internal (implementation isolation within the library).
 
 ## External ports
 
@@ -14,7 +14,7 @@ src/ports/context-query.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
+| Owner | `@fractal-co-design/fca-index` |
 | Consumer | `@methodts/mcp` (`context_query` tool handler) |
 | Direction | fca-index → mcp (unidirectional) |
 | Status | Frozen 2026-04-08 |
@@ -41,7 +41,7 @@ src/ports/coverage-report.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
+| Owner | `@fractal-co-design/fca-index` |
 | Consumers | CLI (`fca-index coverage`), `@methodts/mcp` (`coverage_check` tool) |
 | Direction | fca-index → CLI, fca-index → mcp (unidirectional to both) |
 | Status | Frozen 2026-04-08 |
@@ -68,8 +68,8 @@ src/ports/manifest-reader.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
-| Consumer | `@methodts/fca-index` scanner domain (internal use, but the port itself is external — consuming projects can supply `.fca-index.yaml`) |
+| Owner | `@fractal-co-design/fca-index` |
+| Consumer | `@fractal-co-design/fca-index` scanner domain (internal use, but the port itself is external — consuming projects can supply `.fca-index.yaml`) |
 | Direction | filesystem → fca-index scanner (unidirectional) |
 | Status | Frozen 2026-04-08 |
 
@@ -86,7 +86,7 @@ Key types:
 
 ## Internal ports
 
-Internal ports isolate implementation details within the library. They are not exported from `@methodts/fca-index` and are not part of the public API. They are frozen to stabilize the internal contracts, not because external consumers depend on them.
+Internal ports isolate implementation details within the library. They are not exported from `@fractal-co-design/fca-index` and are not part of the public API. They are frozen to stabilize the internal contracts, not because external consumers depend on them.
 
 ### FileSystemPort
 
@@ -96,7 +96,7 @@ src/ports/internal/file-system.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
+| Owner | `@fractal-co-design/fca-index` |
 | Consumer | `scanner/` domain (internal) |
 | Implementation | `NodeFileSystem` in `cli/node-filesystem.ts` |
 | Status | Frozen 2026-04-08 |
@@ -115,7 +115,7 @@ src/ports/internal/embedding-client.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
+| Owner | `@fractal-co-design/fca-index` |
 | Consumer | `index-store/` domain (internal), `factory.ts` |
 | Implementation | `VoyageEmbeddingClient` in `index-store/embedding-client.ts` |
 | Status | Frozen 2026-04-08 |
@@ -134,7 +134,7 @@ src/ports/internal/index-store.ts
 
 | Attribute | Value |
 |-----------|-------|
-| Owner | `@methodts/fca-index` |
+| Owner | `@fractal-co-design/fca-index` |
 | Consumers | `query/` domain, `coverage/` domain (both internal) |
 | Implementations | `SqliteLanceIndexStore` (production), `InMemoryIndexStore` (tests) |
 | Status | Frozen 2026-04-08 |

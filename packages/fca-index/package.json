@@ -1,16 +1,16 @@
 {
-  "name": "@methodts/fca-index",
-  "version": "0.4.0",
+  "name": "@fractal-co-design/fca-index",
+  "version": "1.0.0",
   "license": "Apache-2.0",
   "author": "Francisco Aramburo",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/VledicFranco/method.git",
+    "url": "git+https://github.com/VledicFranco/fractal-co-design.git",
     "directory": "packages/fca-index"
   },
-  "homepage": "https://github.com/VledicFranco/method#readme",
+  "homepage": "https://github.com/VledicFranco/fractal-co-design#readme",
   "bugs": {
-    "url": "https://github.com/VledicFranco/method/issues"
+    "url": "https://github.com/VledicFranco/fractal-co-design/issues"
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

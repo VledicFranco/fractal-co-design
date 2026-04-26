@@ -1,14 +1,14 @@
-# Testkit — @methodts/fca-index/testkit
+# Testkit — @fractal-co-design/fca-index/testkit
 
-Test doubles for the external ports of `@methodts/fca-index`. Import from the testkit subpackage — these are not included in the production bundle.
+Test doubles for the external ports of `@fractal-co-design/fca-index`. Import from the testkit subpackage — these are not included in the production bundle.
 
 ```typescript
-import { RecordingContextQueryPort, RecordingCoverageReportPort } from '@methodts/fca-index/testkit';
+import { RecordingContextQueryPort, RecordingCoverageReportPort } from '@fractal-co-design/fca-index/testkit';
 ```
 
 **Purpose:** Enable `@methodts/mcp` tests (and any other port consumers) to test their handlers without standing up a real index. The recording ports stub return values and record all calls for assertion.
 
-**When NOT to use:** If you are testing `@methodts/fca-index` internals, use `InMemoryIndexStore` directly — it gives you control over the stored data. The testkit is for consumers of the external ports, not for testing the library itself.
+**When NOT to use:** If you are testing `@fractal-co-design/fca-index` internals, use `InMemoryIndexStore` directly — it gives you control over the stored data. The testkit is for consumers of the external ports, not for testing the library itself.
 
 ---
 
@@ -43,8 +43,8 @@ new RecordingContextQueryPort(options?: {
 
 ```typescript
 import { describe, it } from 'vitest';
-import { RecordingContextQueryPort } from '@methodts/fca-index/testkit';
-import type { ComponentContext } from '@methodts/fca-index';
+import { RecordingContextQueryPort } from '@fractal-co-design/fca-index/testkit';
+import type { ComponentContext } from '@fractal-co-design/fca-index';
 
 describe('my handler', () => {
   it('queries the index and formats results', async () => {
@@ -119,7 +119,7 @@ Default stub values:
 ### Usage example (vitest)
 
 ```typescript
-import { RecordingCoverageReportPort } from '@methodts/fca-index/testkit';
+import { RecordingCoverageReportPort } from '@fractal-co-design/fca-index/testkit';
 
 const port = new RecordingCoverageReportPort({
   mode: 'production',
