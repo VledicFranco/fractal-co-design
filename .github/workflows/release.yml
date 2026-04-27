@@ -36,7 +36,13 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Upgrade npm CLI for trusted publishing
-        run: npm install -g npm@latest
+        # OIDC trusted publishing requires npm >= 11.5.1. The npm 10.x
+        # bundled with Node 22.22.2 has a known broken module tree
+        # (missing `promise-retry` in @npmcli/arborist) that crashes
+        # the in-place `npm install -g npm@latest`. `--force` bypasses
+        # the rebuild safety checks and lets the upgrade complete.
+        # See: https://github.com/actions/runner-images/issues/13883
+        run: npm install -g npm@latest --force
 
       - run: pnpm install --frozen-lockfile
 
