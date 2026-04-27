@@ -1,6 +1,6 @@
 {
   "name": "@fractal-co-design/skills",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "CLI installer for the fcd-* Claude Code skill family. Drops skills into ~/.claude/skills/ in one command.",
   "license": "MIT",
   "author": "VledicFranco",
