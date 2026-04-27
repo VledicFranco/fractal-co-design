@@ -35,14 +35,27 @@ jobs:
           # Ensure publishes use the public registry; OIDC requires this URL.
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Upgrade npm CLI for trusted publishing
-        # OIDC trusted publishing requires npm >= 11.5.1. The npm 10.x
-        # bundled with Node 22.22.2 has a known broken module tree
-        # (missing `promise-retry` in @npmcli/arborist) that crashes
-        # the in-place `npm install -g npm@latest`. `--force` bypasses
-        # the rebuild safety checks and lets the upgrade complete.
+      - name: Install npm 11.11.0 from tarball (OIDC trusted publishing)
+        # OIDC trusted publishing requires npm >= 11.5.1. The npm 10.9.7
+        # bundled with Node 22.22.2 has a broken module tree
+        # (missing promise-retry in @npmcli/arborist), so any operation
+        # that touches the rebuild path (incl. `npm install -g npm`,
+        # even with --force) crashes with MODULE_NOT_FOUND.
+        # Workaround: download the npm tarball directly and replace the
+        # broken bundle wholesale. This bypasses the broken in-place
+        # install entirely.
         # See: https://github.com/actions/runner-images/issues/13883
-        run: npm install -g npm@latest --force
+        run: |
+          set -euo pipefail
+          NPM_VERSION="11.11.0"
+          NPM_PATH=$(dirname $(dirname $(readlink -f $(which npm))))/lib/node_modules/npm
+          echo "Replacing broken npm at $NPM_PATH with v$NPM_VERSION"
+          curl -fsSL "https://registry.npmjs.org/npm/-/npm-${NPM_VERSION}.tgz" -o /tmp/npm.tgz
+          rm -rf "$NPM_PATH"
+          mkdir -p "$NPM_PATH"
+          tar -xzf /tmp/npm.tgz -C "$NPM_PATH" --strip-components=1
+          rm /tmp/npm.tgz
+          npm --version
 
       - run: pnpm install --frozen-lockfile
 
