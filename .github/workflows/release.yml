@@ -48,14 +48,19 @@ jobs:
         run: |
           set -euo pipefail
           NPM_VERSION="11.11.0"
-          NPM_PATH=$(dirname $(dirname $(readlink -f $(which npm))))/lib/node_modules/npm
-          echo "Replacing broken npm at $NPM_PATH with v$NPM_VERSION"
+          # `which npm` is a symlink in /bin → resolve to the cli script,
+          # then dirname dirname gives the actual npm install directory:
+          # /opt/hostedtoolcache/node/<v>/x64/lib/node_modules/npm
+          NPM_PATH=$(dirname $(dirname $(readlink -f $(which npm))))
+          echo "Before: npm --version = $(npm --version) at $NPM_PATH"
           curl -fsSL "https://registry.npmjs.org/npm/-/npm-${NPM_VERSION}.tgz" -o /tmp/npm.tgz
           rm -rf "$NPM_PATH"
           mkdir -p "$NPM_PATH"
           tar -xzf /tmp/npm.tgz -C "$NPM_PATH" --strip-components=1
           rm /tmp/npm.tgz
-          npm --version
+          echo "After:  npm --version = $(npm --version) at $NPM_PATH"
+          # Sanity: the new npm must be ≥ 11.5.1 for OIDC trusted publishing
+          node -e "const v=process.argv[1].split('.').map(Number); if(v[0]<11||(v[0]===11&&v[1]<5)) {console.error('npm', v.join('.'),'is too old for OIDC');process.exit(1)}" "$(npm --version)"
 
       - run: pnpm install --frozen-lockfile
 
