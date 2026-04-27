@@ -1,5 +1,9 @@
 # `@fractal-co-design/skills`
 
+[![npm version](https://img.shields.io/npm/v/@fractal-co-design/skills.svg)](https://www.npmjs.com/package/@fractal-co-design/skills)
+[![npm downloads](https://img.shields.io/npm/dm/@fractal-co-design/skills.svg)](https://www.npmjs.com/package/@fractal-co-design/skills)
+[![license](https://img.shields.io/npm/l/@fractal-co-design/skills.svg)](https://github.com/VledicFranco/fractal-co-design/blob/main/LICENSE)
+
 > One-command installer for the [Fractal Co-Design](https://github.com/VledicFranco/fractal-co-design) Claude Code skill family.
 
 Drops the `fcd-*` skills, the `fca` knowledge skill, and their support skills into your `~/.claude/skills/` directory. After install, the skills are available in any Claude Code session via `/fcd-design`, `/fcd-review`, `/fcd-card`, etc.
