@@ -115,4 +115,112 @@ describe('DefaultManifestReader — regression for existing fields', () => {
     );
     expect(config.requiredParts).toEqual(['interface', 'documentation', 'port']);
   });
+
+  // Regression: a YAML file saved with Windows (CRLF) line endings used to
+  // parse to `{}` because `parseConfig` split on `\n` only, leaving a `\r`
+  // on every line — and the regexes use `(.+)$` where neither `.` nor `$`
+  // accepts `\r`. The fix splits on `/\r?\n/` so CRLF and LF are equivalent.
+  it('parses CRLF line endings (Windows-style)', async () => {
+    const config = await readConfig(
+      [
+        '# header comment',
+        'languages: [typescript, scala]',
+        'coverageThreshold: 0.8',
+        'sourcePatterns:',
+        '  - "modules/**"',
+        '  - "packages/**/src/**"',
+        'excludePatterns:',
+        '  - "**/node_modules/**"',
+      ].join('\r\n'),
+    );
+    expect(config.languages).toEqual(['typescript', 'scala']);
+    expect(config.coverageThreshold).toBe(0.8);
+    expect(config.sourcePatterns).toEqual(['modules/**', 'packages/**/src/**']);
+    expect(config.excludePatterns).toEqual(['**/node_modules/**']);
+  });
+
+  it('parses mixed CRLF + LF (e.g. file with mixed line endings)', async () => {
+    // Constructed to exercise both endings within a single file, which can
+    // happen when files are edited across editors with different defaults.
+    const yaml =
+      'languages: [scala]\r\n' +
+      'sourcePatterns:\r\n' +
+      '  - "modules/**"\n' +    // single LF
+      '  - "packages/**"\r\n';
+    const config = await readConfig(yaml);
+    expect(config.languages).toEqual(['scala']);
+    expect(config.sourcePatterns).toEqual(['modules/**', 'packages/**']);
+  });
+
+  // Regression: inline `# comment` on a list-item or scalar value used to
+  // be retained as part of the value (e.g. sourcePatterns ended up as
+  // `'"modules/**"            # PRD-108 ...'`). The fix adds a
+  // stripInlineComment pass, careful to only strip a `# ` that is preceded
+  // by whitespace so we don't break globs/regexes that legitimately
+  // contain `#`.
+  it('strips trailing inline comments from list-item values', async () => {
+    const config = await readConfig(
+      [
+        'sourcePatterns:',
+        '  - "modules/**"            # PRD-108 broadened from narrower pattern',
+        '  - "packages/**/src/**"',
+        'excludePatterns:',
+        '  - "**/target/**"   # subsumes nested target dirs',
+      ].join('\n'),
+    );
+    expect(config.sourcePatterns).toEqual(['modules/**', 'packages/**/src/**']);
+    expect(config.excludePatterns).toEqual(['**/target/**']);
+  });
+
+  it('strips trailing inline comments from scalar values', async () => {
+    const config = await readConfig(
+      [
+        'coverageThreshold: 0.8     # raised after PRD-108 production-mode lift',
+        'embeddingModel: voyage-3-lite # cheaper option for high-volume scans',
+      ].join('\n'),
+    );
+    expect(config.coverageThreshold).toBe(0.8);
+    expect(config.embeddingModel).toBe('voyage-3-lite');
+  });
+
+  it('preserves `#` characters that are part of a value (no preceding whitespace)', async () => {
+    // Realistic case: a glob or regex pattern containing `#`.
+    // The hash must be preceded by whitespace to be a comment.
+    const config = await readConfig(
+      ['sourcePatterns:', '  - "src/**/file#with#hash.txt"'].join('\n'),
+    );
+    expect(config.sourcePatterns).toEqual(['src/**/file#with#hash.txt']);
+  });
+
+  // Regression: comment-only continuation lines used to reset
+  // `currentArrayKey`, dropping any list items below the comment.
+  it('preserves array-mode across blank/comment-only lines', async () => {
+    const config = await readConfig(
+      [
+        'sourcePatterns:',
+        '  - "modules/**"',
+        '  # NOTE: the next pattern catches nested apps under packages/.',
+        '',
+        '  - "packages/**/src/**"',
+      ].join('\n'),
+    );
+    expect(config.sourcePatterns).toEqual(['modules/**', 'packages/**/src/**']);
+  });
+
+  // Regression: inline-flow form was only handled for `languages`.
+  // requiredParts / sourcePatterns / excludePatterns silently fell through.
+  it('parses requiredParts in inline-flow form', async () => {
+    const config = await readConfig('requiredParts: [interface, documentation]');
+    expect(config.requiredParts).toEqual(['interface', 'documentation']);
+  });
+
+  it('parses sourcePatterns in inline-flow form', async () => {
+    const config = await readConfig('sourcePatterns: ["modules/**", "packages/**"]');
+    expect(config.sourcePatterns).toEqual(['modules/**', 'packages/**']);
+  });
+
+  it('parses excludePatterns in inline-flow form', async () => {
+    const config = await readConfig('excludePatterns: ["**/target/**", "**/dist/**"]');
+    expect(config.excludePatterns).toEqual(['**/target/**', '**/dist/**']);
+  });
 });

@@ -42,11 +42,23 @@ export class DefaultManifestReader implements ManifestReaderPort {
       | 'languages'
       | null = null;
 
-    for (const line of yaml.split('\n')) {
+    // Split on CRLF or LF — `.split('\n')` alone leaves a trailing `\r` on
+    // every line under Windows line endings. The regexes below use `(.+)$`
+    // which fails on those lines because `.` does not match `\r` (it's a
+    // line terminator in JS regex) and `$` does not anchor before `\r`.
+    // The result was a silently empty config for every CRLF-saved file.
+    for (const line of yaml.split(/\r?\n/)) {
+      // Whole-line comment or blank line — preserve currentArrayKey so list
+      // items can have comment-only continuation lines between them
+      // (common when authors annotate one item with a multi-line note).
+      if (/^\s*(#.*)?$/.test(line)) {
+        continue;
+      }
+
       // YAML list item — must check first to preserve array collection state
       const listMatch = line.match(/^\s+-\s+(.+)$/);
       if (listMatch && currentArrayKey) {
-        const value = stripYamlScalar(listMatch[1].trim());
+        const value = stripYamlScalar(stripInlineComment(listMatch[1].trim()));
         if (currentArrayKey === 'sourcePatterns') {
           (result.sourcePatterns ??= []).push(value);
         } else if (currentArrayKey === 'excludePatterns') {
@@ -59,14 +71,14 @@ export class DefaultManifestReader implements ManifestReaderPort {
         continue;
       }
 
-      // Any non-list line ends the current array block
+      // Any non-list, non-comment line ends the current array block
       currentArrayKey = null;
 
       // Scalar key: value line
       const scalarMatch = line.match(/^(\w+):\s*(.+)$/);
       if (scalarMatch) {
         const [, key, raw] = scalarMatch;
-        const value = raw.trim();
+        const value = stripInlineComment(raw.trim());
         switch (key) {
           case 'coverageThreshold': {
             const n = parseFloat(value);
@@ -88,6 +100,24 @@ export class DefaultManifestReader implements ManifestReaderPort {
             // Inline flow form: languages: [typescript, scala]
             const parsed = parseInlineFlowList(value);
             if (parsed) result.languages = parsed;
+            break;
+          }
+          case 'requiredParts': {
+            // Inline flow form: requiredParts: [interface, documentation]
+            const parsed = parseInlineFlowList(value);
+            if (parsed) result.requiredParts = parsed as FcaPart[];
+            break;
+          }
+          case 'sourcePatterns': {
+            // Inline flow form: sourcePatterns: ["modules/**", "packages/**"]
+            const parsed = parseInlineFlowList(value);
+            if (parsed) result.sourcePatterns = parsed;
+            break;
+          }
+          case 'excludePatterns': {
+            // Inline flow form: excludePatterns: ["**/node_modules/**"]
+            const parsed = parseInlineFlowList(value);
+            if (parsed) result.excludePatterns = parsed;
             break;
           }
         }
@@ -123,6 +153,31 @@ function parseInlineFlowList(raw: string): string[] | null {
   const inner = raw.slice(1, -1).trim();
   if (inner === '') return [];
   return inner.split(',').map(s => stripYamlScalar(s.trim()));
+}
+
+/**
+ * Strip a trailing `# comment` from a YAML scalar value. The hash must be
+ * preceded by whitespace (to avoid stripping `#` characters that are part
+ * of a glob, regex, or quoted string). If the value is wholly inside
+ * matching quotes, the comment is *outside* the closing quote.
+ */
+function stripInlineComment(value: string): string {
+  // Wholly-quoted scalar: comment must come after the closing quote.
+  if ((value.startsWith('"') || value.startsWith("'")) && value.length >= 2) {
+    const quote = value[0];
+    const closeIdx = value.indexOf(quote, 1);
+    if (closeIdx > 0) {
+      const afterQuote = value.slice(closeIdx + 1);
+      const hashIdx = afterQuote.indexOf('#');
+      if (hashIdx >= 0) {
+        return value.slice(0, closeIdx + 1 + hashIdx).trimEnd();
+      }
+      return value.slice(0, closeIdx + 1) + afterQuote;
+    }
+  }
+  // Bare scalar: comment must be preceded by whitespace.
+  const m = value.match(/^(.*?)\s+#/);
+  return m ? m[1].trimEnd() : value;
 }
 
 /** Remove surrounding single or double quotes from a YAML scalar. */
